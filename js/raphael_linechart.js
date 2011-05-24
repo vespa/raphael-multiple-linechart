@@ -178,6 +178,8 @@ Raphael.fn.lineChart = function(method) {
 			this.lineChart.settings = helpers.extend(true, {}, this.lineChart.defaults, options);
 			this.customAttributes.lineChart = {};
 			
+			//TODO either data or data_holder is a must
+			
 			// let's go
 			var element = this,
 				o = this.customAttributes.lineChart,
@@ -186,7 +188,7 @@ Raphael.fn.lineChart = function(method) {
 				width = settings.width,
 				height = settings.height,
 				
-				table = helpers.loadTableData(settings.data_holder), //TODO allow passing data by array
+				table = helpers.getTable(o, settings.data, settings.data_holder),
 				size = table.labels.length,
 				
 				X = (width - gutter.left) / size,
@@ -351,8 +353,36 @@ Raphael.fn.lineChart = function(method) {
 			blanket.toFront();
 		},
 		
+		setDataIndex: function(index) {
+			var o = this.customAttributes.lineChart;
+			
+			if (index < o.dataArray.data.length) {
+				var one = {
+					labels: o.dataArray.labels,
+					data: o.dataArray.data[index],
+					lines1: o.dataArray.lines1[index],
+					lines2: o.dataArray.lines2[index]
+				};
+				return this.lineChart('setData', one);
+			}
+			else
+			{
+				return helpers.error('Data index out of range.');
+			}
+		},
+		
+		setDataHolder: function(holder) {
+			var table = helpers.loadTableData(holder);
+			if (table) {
+				return this.lineChart('setData', table);
+			}
+			else {
+				return helpers.error('No data holder element supplied.');
+			}
+		},
+		
 		// Caution: this would only work for the same number of records
-		setDataHolder: function(id) {
+		setData: function(table) {
 			var element = this,
 				settings = this.lineChart.settings,
 				o = this.customAttributes.lineChart,
@@ -360,19 +390,16 @@ Raphael.fn.lineChart = function(method) {
 				height = settings.height,
 				gutter = settings.gutter,
 				
-				table = helpers.loadTableData(id),
-				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
 				Y = (height - gutter.bottom - gutter.top) / max,
 				
 				p, bgpp;
 			
+			table = helpers.getTable(o, table);
+			
 			if (table.labels.length != o.size) {
-				if (console && console.error) {
-					console.error('Error: new data source has to be of same size');
-					return false;
-				}
+				return helpers.error('New data source has to be of same size');
 			}
 			
 			for (var i = 0, ii = table.labels.length; i < ii; i++) {
@@ -526,8 +553,29 @@ Raphael.fn.lineChart = function(method) {
 			};
 		},
 		
-		loadTableData: function(table_id) {
-			var table = document.getElementById(table_id),
+		getTable: function(o, obj, elm) {
+			if (obj) {
+				// handle multiple data rows
+				if (obj.data[0].constructor == Array) {
+					o.dataArray = obj;
+					var one = {};
+					one.labels = obj.labels;
+					one.data = obj.data[0];
+					one.lines1 = obj.lines1[0];
+					one.lines2 = obj.lines2[0];
+					return one;
+				}
+				else {
+					return obj;
+				}
+			}
+			else {
+				return helpers.loadTableData(elm);
+			}
+		},
+		
+		loadTableData: function(elm) {
+			var table = (elm && elm.constructor == String) ? document.getElementById(elm) : elm,
 				res = {
 					labels: [],
 					data: [],
@@ -672,6 +720,13 @@ Raphael.fn.lineChart = function(method) {
 							j * step).attr(style);
 				o.YLabels.push(l);
 			}
+		},
+		
+		error: function(message) {
+			if (console && console.error) {
+				console.error('lineChart Error: ' + message);
+			}	
+			return false;
 		}
 	};
 	
@@ -681,14 +736,13 @@ Raphael.fn.lineChart = function(method) {
 	} else if (typeof method === 'object' || !method) {
 		return methods.init.apply(this, arguments);
 	} else {
-		if (console && console.error) {
-			console.error('lineChart: Method "' + method + '" not found.');
-		}
+		return helpers.error('Method "' + method + '" not found.');
 	}
 };
 
 Raphael.fn.lineChart.defaults = {
 	data_holder: null,		// table element holding the data to display
+	data: null,				// alternatively, supply a data object
 	width: 500,				// chart width
 	height: 250,			// chart height
 	gutter: {				// gutter dimensions

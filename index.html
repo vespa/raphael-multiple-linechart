@@ -122,7 +122,7 @@
 
 		<div>
 
-			<h2>Features</h2>
+			<h2><a name="features">Features</a></h2>
 			
 			<p>
 				The concept for the code is dervied from the Raphaël
@@ -136,7 +136,7 @@
 				</ul>
 			</p>
 			
-			<h2>Requirements</h2>
+			<h2><a name="requirements">Requirements</a></h2>
 		
 			<p>
 				<ul>
@@ -154,24 +154,56 @@
 
 		<div>
 
-			<h2>Usage</h2>
+			<h2><a name="usage">Usage</a></h2>
 			
-			<h3>Include it.</h3>
+			<h3><a name="usage_include">Include it.</a></h3>
 			
 			<script src="https://gist.github.com/986722.js?file=gistfile1.html"></script>
 			
-			<h3>Give it data.</h3>
+			<h3><a name="usage_data">Give it data.</a></h3>
 			
 			<p>
-				Future versions will allow more flexible ways of passing data, either by different
-				types of elements or by directly passing an array.
+				Provide the plugin with either:
 			</p>
 			
-			<script src="https://gist.github.com/986725.js?file=gistfile1.html"></script>
+			<ul>
+				<li>
+					<p>
+					  A table element (the DOM element or just its id) using a specific structure:
+					</p>
+					<script src="https://gist.github.com/986725.js?file=gistfile1.html"></script>
+				</li>
+				<li>
+					<p>
+					  A data object with four arrays: labels, values and info lines 1 &amp; 2:
+					</p>
+					<script src="https://gist.github.com/989403.js?file=gistfile1.js"></script>
+				</li>
+				<li>
+					<p>
+						A data object with the same structure, but with <b>array lists</b> for the
+						values and info lines.<br/>
+						The first list would be immediately used, and you can then switch
+						data object to display by passing the array index<br/>
+						(see <a href="#usage_dance"><i>Dance</i></a>).
+					</p>
+					<script src="https://gist.github.com/989415.js?file=gistfile1.js"></script>
+				</li>
+			</ul>
 			
-			<h3>Call it.</h3>
+			<h3><a name="usage_call">Call it.</a></h3>
 			
 			<script src="https://gist.github.com/986726.js?file=gistfile1.html"></script>
+			
+			<h3><a name="usage_dance">Dance.</a></h3>
+			
+			<p>
+			  If you'd like, you can tell the plugin to change the dataset it's displaying.<br/>
+			  You can either pass a new table element, a new data object or an index (if you used
+			  the objects array method).<br/>
+			  The chart would magically move to the new spot, using a configurable Raphaël animation.
+			</p>
+			<script src="https://gist.github.com/989423.js?file=gistfile1.js"></script>
 			
 		</div>
 
@@ -183,9 +215,7 @@
 
 		<div>
 			
-			<a name="drawline"></a>
-			
-			<h2>Documentation</h2>
+			<h2><a name="documentations">Documentation</a></h2>
 		
 			<p>The lineChart() plugin will accept a list of arguments in a json style format.</p>
 			
@@ -195,9 +225,7 @@
 
 		<div>
 			
-			<a name="drawline"></a>
-			
-			<h2>Download</h2>
+			<h2><a name="download">Download</a></h2>
 			
 			<p>
 				Check out <a href="https://github.com/n0nick/raphael-linechart">the project page on GitHub</a>
@@ -214,7 +242,19 @@
 
 		<div>
 
-			<h2>Thanks!</h2>
+		  <h2><a name="license">License</a></h2>
+
+		  <p>
+		    The plugin is dual-licensed under the
+		    <a href="http://www.opensource.org/licenses/gpl-3.0">GNU Public License</a>
+		    and the <a href="http://www.opensource.org/licenses/mit-license">MIT License</a>.
+		  </p>
+
+		</div>
+
+		<div>
+
+			<h2><a name="thanks">Thanks!</a></h2>
 			<p>
 				This page is mostly a rip-off of the original
 				<a href="http://joedesigns.com/labs/Beautiful-Analytics-Chart/">Beautiful Analytics Chart</a>
