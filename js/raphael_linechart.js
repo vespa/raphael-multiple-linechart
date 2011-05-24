@@ -177,6 +177,8 @@ Raphael.fn.lineChart = function(method) {
 
 			this.lineChart.settings = helpers.extend(true, {}, this.lineChart.defaults, options);
 			this.customAttributes.lineChart = {};
+
+      //TODO data holder is a must
 			
 			// let's go
 			var element = this,
@@ -352,7 +354,7 @@ Raphael.fn.lineChart = function(method) {
 		},
 		
 		// Caution: this would only work for the same number of records
-		setDataHolder: function(id) {
+		setDataHolder: function(holder) {
 			var element = this,
 				settings = this.lineChart.settings,
 				o = this.customAttributes.lineChart,
@@ -360,7 +362,7 @@ Raphael.fn.lineChart = function(method) {
 				height = settings.height,
 				gutter = settings.gutter,
 				
-				table = helpers.loadTableData(id),
+				table = helpers.loadTableData(holder),
 				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
@@ -526,8 +528,8 @@ Raphael.fn.lineChart = function(method) {
 			};
 		},
 		
-		loadTableData: function(table_id) {
-			var table = document.getElementById(table_id),
+		loadTableData: function(elm) {
+			var table = (elm && elm.constructor == String) ? document.getElementById(elm) : elm,
 				res = {
 					labels: [],
 					data: [],
