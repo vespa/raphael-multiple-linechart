@@ -188,7 +188,7 @@ Raphael.fn.lineChart = function(method) {
 				width = settings.width,
 				height = settings.height,
 				
-				table = settings.data || helpers.loadTableData(settings.data_holder),
+				table = helpers.getTable(o, settings.data, settings.data_holder),
 				size = table.labels.length,
 				
 				X = (width - gutter.left) / size,
@@ -351,6 +351,24 @@ Raphael.fn.lineChart = function(method) {
 			o.label[0].toFront();
 			o.label[1].toFront();
 			blanket.toFront();
+		},
+		
+		setDataIndex: function(index) {
+			var o = this.customAttributes.lineChart;
+			
+			if (index < o.dataArray.data.length) {
+				var one = {
+					labels: o.dataArray.labels,
+					data: o.dataArray.data[index],
+					lines1: o.dataArray.lines1[index],
+					lines2: o.dataArray.lines2[index]
+				};
+				return this.lineChart('setData', one);
+			}
+			else
+			{
+				return helpers.error('Data index out of range.');
+			}
 		},
 		
 		setDataHolder: function(holder) {
@@ -531,6 +549,27 @@ Raphael.fn.lineChart = function(method) {
 				x2: p2x + dx2,
 				y2: p2y + dy2
 			};
+		},
+		
+		getTable: function(o, obj, elm) {
+			if (obj) {
+				// handle multiple data rows
+				if (obj.data.constructor == Array) {
+					o.dataArray = obj;
+					var one = {};
+					one.labels = obj.labels;
+					one.data = obj.data[0];
+					one.lines1 = obj.lines1[0];
+					one.lines2 = obj.lines2[0];
+					return one;
+				}
+				else {
+					return obj;
+				}
+			}
+			else {
+				return helpers.loadTableData(elm);
+			}
 		},
 		
 		loadTableData: function(elm) {
