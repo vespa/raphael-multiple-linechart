@@ -1,6 +1,6 @@
 # Raphaël Line Charts Plugin #
 
-This plugin is a result of fruslitration from current client-side charting solutions.	 
+This plugin is a result of frustration from current client-side charting solutions.	 
 I needed something simple that would draw a line chart in SVG based on a table in a page, be customizable enough and allow me to change the data set on demand. I couldn't find one.	
 So here goes. 
 
