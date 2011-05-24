@@ -177,8 +177,8 @@ Raphael.fn.lineChart = function(method) {
 
 			this.lineChart.settings = helpers.extend(true, {}, this.lineChart.defaults, options);
 			this.customAttributes.lineChart = {};
-
-      //TODO data holder is a must
+			
+			//TODO either data or data_holder is a must
 			
 			// let's go
 			var element = this,
@@ -188,7 +188,7 @@ Raphael.fn.lineChart = function(method) {
 				width = settings.width,
 				height = settings.height,
 				
-				table = helpers.loadTableData(settings.data_holder), //TODO allow passing data by array
+				table = settings.data || helpers.loadTableData(settings.data_holder),
 				size = table.labels.length,
 				
 				X = (width - gutter.left) / size,
@@ -353,16 +353,24 @@ Raphael.fn.lineChart = function(method) {
 			blanket.toFront();
 		},
 		
-		// Caution: this would only work for the same number of records
 		setDataHolder: function(holder) {
+			var table = helpers.loadTableData(holder);
+			if (table) {
+				return this.lineChart('setData', table);
+			}
+			else {
+				return helpers.error('No data holder element supplied.');
+			}
+		},
+		
+		// Caution: this would only work for the same number of records
+		setData: function(table) {
 			var element = this,
 				settings = this.lineChart.settings,
 				o = this.customAttributes.lineChart,
 				width = settings.width,
 				height = settings.height,
 				gutter = settings.gutter,
-				
-				table = helpers.loadTableData(holder),
 				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
@@ -371,10 +379,7 @@ Raphael.fn.lineChart = function(method) {
 				p, bgpp;
 			
 			if (table.labels.length != o.size) {
-				if (console && console.error) {
-					console.error('Error: new data source has to be of same size');
-					return false;
-				}
+				return helpers.error('New data source has to be of same size');
 			}
 			
 			for (var i = 0, ii = table.labels.length; i < ii; i++) {
@@ -674,6 +679,13 @@ Raphael.fn.lineChart = function(method) {
 							j * step).attr(style);
 				o.YLabels.push(l);
 			}
+		},
+		
+		error: function(message) {
+			if (console && console.error) {
+				console.error('lineChart Error: ' + message);
+			}	
+			return false;
 		}
 	};
 	
@@ -683,14 +695,13 @@ Raphael.fn.lineChart = function(method) {
 	} else if (typeof method === 'object' || !method) {
 		return methods.init.apply(this, arguments);
 	} else {
-		if (console && console.error) {
-			console.error('lineChart: Method "' + method + '" not found.');
-		}
+		return helpers.error('Method "' + method + '" not found.');
 	}
 };
 
 Raphael.fn.lineChart.defaults = {
 	data_holder: null,		// table element holding the data to display
+	data: null,				// alternatively, supply a data object
 	width: 500,				// chart width
 	height: 250,			// chart height
 	gutter: {				// gutter dimensions
