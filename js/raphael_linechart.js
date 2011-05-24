@@ -396,6 +396,8 @@ Raphael.fn.lineChart = function(method) {
 				
 				p, bgpp;
 			
+			table = helpers.getTable(o, table);
+			
 			if (table.labels.length != o.size) {
 				return helpers.error('New data source has to be of same size');
 			}
@@ -554,7 +556,7 @@ Raphael.fn.lineChart = function(method) {
 		getTable: function(o, obj, elm) {
 			if (obj) {
 				// handle multiple data rows
-				if (obj.data.constructor == Array) {
+				if (obj.data[0].constructor == Array) {
 					o.dataArray = obj;
 					var one = {};
 					one.labels = obj.labels;
