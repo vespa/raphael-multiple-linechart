@@ -763,7 +763,7 @@ Raphael.fn.lineChart.defaults = {
 	colors: {				// color settings
 		master: '#01A8F0',
 		line1: '#000000',
-		line2: '#01A8F0',
+		line2: '#01A8F0'
 	},
 	text: {					// text style settings
 		axis_labels: {
