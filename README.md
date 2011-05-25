@@ -203,7 +203,7 @@ r.lineChart(opts); // draw the line chart in an initiated Raphael object
 
 ## License ##
 
-The plugin is dual-licensed under the [GNU Public License][5] and the [MIT License][6].
+The plugin is dual-licensed under the [GNU General Public License][5] and the [MIT License][6].
 
 ## Enjoy. ##
 
