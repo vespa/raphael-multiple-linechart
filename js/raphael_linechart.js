@@ -703,7 +703,7 @@ Raphael.fn.lineChart = function(method) {
 		drawYLabels: function(elm, x, y, height, count, max, top, style) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
-				step = Math.floor(max / count),
+				step = Math.round(max / count),
 				labelHeight = (height - top - y) / count;
 			
 			// reset old labels
@@ -715,9 +715,19 @@ Raphael.fn.lineChart = function(method) {
 			
 			o.YLabels = [];
 			for (var j = 0; j <= count; j++) {
-				var l = elm.text(x,
-							height - y - (j * labelHeight),
-							j * step).attr(style);
+				var txt = (j * (max/count)),
+					l;
+				
+				if (txt < 1) {
+					txt = (txt+'').replace(/\.(\d{2})\d*/, '.$1');
+				}
+				else {
+					txt = Math.round(txt);
+				}
+				
+				l = elm.text(x,
+						height - y - (j * labelHeight),
+						txt).attr(style);
 				o.YLabels.push(l);
 			}
 		},
