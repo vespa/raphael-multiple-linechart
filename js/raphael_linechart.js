@@ -574,33 +574,56 @@ Raphael.fn.lineChart = function(method) {
 			}
 		},
 		
-		loadTableData: function(elm) {
-			var table = (elm && elm.constructor == String) ? document.getElementById(elm) : elm,
+		loadTableData: function(table_elm) {
+			var table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
 				res = {
 					labels: [],
 					data: [],
 					lines1: [],
 					lines2: []
 				},
-				labels, data, lines1, lines2, j;
+        tds = {},
+        curr, td, i, j;
 			
 			if (table) {
-				labels = table.getElementsByTagName('tfoot')[0].getElementsByTagName('th');
-				for (j=0; j < labels.length; j++) {
-					res.labels.push(labels[j].innerHTML);
-				}
-				data = table.getElementsByClassName('data')[0].getElementsByTagName('td');
-				for (j=0; j < data.length; j++) {
-					res.data.push(data[j].innerHTML);
-				}
-				lines1 = table.getElementsByClassName('line1')[0].getElementsByTagName('td');
-				for (j=0; j < lines1.length; j++) {
-					res.lines1.push(lines1[j].innerHTML);
-				}
-				lines2 = table.getElementsByClassName('line2')[0].getElementsByTagName('td');
-				for (j=0; j < lines2.length; j++) {
-					res.lines2.push(lines2[j].innerHTML);
-				}
+        // find elements to collect
+        for (i=0; i < table.childNodes.length; i++, curr = null, td = 'td') {
+          if (table.childNodes[i].tagName == 'TFOOT') {
+            curr = 'labels';
+            td = 'th';
+          }
+          else if (table.childNodes[i].tagName == 'TBODY') {
+            if (table.childNodes[i].className == 'data') {
+              curr = 'data';
+            }
+            else if (table.childNodes[i].className == 'line1') {
+              curr = 'lines1';
+            }
+            else if (table.childNodes[i].className == 'line2') {
+              curr = 'lines2';
+            }
+          }
+
+          if (curr) {
+            tds[curr] = table.childNodes[i].getElementsByTagName(td);
+          }
+        }
+
+        // populate res
+        if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
+	  			for (j=0; j < tds.labels.length; j++) {
+					  res.labels.push(tds.labels[j].innerHTML);
+				  }
+			  	for (j=0; j < tds.data.length; j++) {
+				  	res.data.push(tds.data[j].innerHTML);
+			  	}
+		  		for (j=0; j < tds.lines1.length; j++) {
+	  				res.lines1.push(tds.lines1[j].innerHTML);
+  				}
+  				for (j=0; j < tds.lines2.length; j++) {
+  					res.lines2.push(tds.lines2[j].innerHTML);
+  				}
+        }
 				return res;
 			} else {
 				return false;
