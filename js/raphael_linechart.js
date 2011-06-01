@@ -792,3 +792,4 @@ Raphael.fn.lineChart.defaults = {
 };
 
 })();
+
