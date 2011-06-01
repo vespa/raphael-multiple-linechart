@@ -188,7 +188,7 @@ Raphael.fn.lineChart = function(method) {
 				width = settings.width,
 				height = settings.height,
 				
-				table = helpers.getTable(o, settings.data, settings.data_holder),
+				table = helpers.getTable(element, o, settings.data, settings.data_holder),
 				size = table.labels.length,
 				
 				X = (width - gutter.left) / size,
@@ -372,7 +372,7 @@ Raphael.fn.lineChart = function(method) {
 		},
 		
 		setDataHolder: function(holder) {
-			var table = helpers.loadTableData(holder);
+			var table = helpers.loadTableData(this, holder);
 			if (table) {
 				return this.lineChart('setData', table);
 			}
@@ -396,7 +396,7 @@ Raphael.fn.lineChart = function(method) {
 				
 				p, bgpp;
 			
-			table = helpers.getTable(o, table);
+			table = helpers.getTable(element, o, table);
 			
 			if (table.labels.length != o.size) {
 				return helpers.error('New data source has to be of same size');
@@ -553,7 +553,7 @@ Raphael.fn.lineChart = function(method) {
 			};
 		},
 		
-		getTable: function(o, obj, elm) {
+		getTable: function(elm, o, obj, table_elm) {
 			if (obj) {
 				// handle multiple data rows
 				if (obj.data[0].constructor == Array) {
@@ -570,37 +570,61 @@ Raphael.fn.lineChart = function(method) {
 				}
 			}
 			else {
-				return helpers.loadTableData(elm);
+				return helpers.loadTableData(elm, table_elm);
 			}
 		},
 		
-		loadTableData: function(elm) {
-			var table = (elm && elm.constructor == String) ? document.getElementById(elm) : elm,
-				res = {
-					labels: [],
-					data: [],
-					lines1: [],
-					lines2: []
-				},
-				labels, data, lines1, lines2, j;
+		loadTableData: function(elm, table_elm) {
+			var settings = elm.lineChart.settings,
+          table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
+  				res = {
+  					labels: [],
+  					data: [],
+  					lines1: [],
+  					lines2: []
+  				},
+          tds = {},
+          curr, td, i, j;
 			
 			if (table) {
-				labels = table.getElementsByTagName('tfoot')[0].getElementsByTagName('th');
-				for (j=0; j < labels.length; j++) {
-					res.labels.push(labels[j].innerHTML);
-				}
-				data = table.getElementsByClassName('data')[0].getElementsByTagName('td');
-				for (j=0; j < data.length; j++) {
-					res.data.push(data[j].innerHTML);
-				}
-				lines1 = table.getElementsByClassName('line1')[0].getElementsByTagName('td');
-				for (j=0; j < lines1.length; j++) {
-					res.lines1.push(lines1[j].innerHTML);
-				}
-				lines2 = table.getElementsByClassName('line2')[0].getElementsByTagName('td');
-				for (j=0; j < lines2.length; j++) {
-					res.lines2.push(lines2[j].innerHTML);
-				}
+        // find elements to collect
+        for (i=0; i < table.childNodes.length; i++, curr = null, td = 'td') {
+          if (table.childNodes[i].tagName == 'TFOOT') {
+            curr = 'labels';
+            td = 'th';
+          }
+          else if (table.childNodes[i].tagName == 'TBODY') {
+            if (table.childNodes[i].className == settings.table_classes.data) {
+              curr = 'data';
+            }
+            else if (table.childNodes[i].className == settings.table_classes.line1) {
+              curr = 'lines1';
+            }
+            else if (table.childNodes[i].className == settings.table_classes.line2) {
+              curr = 'lines2';
+            }
+          }
+
+          if (curr) {
+            tds[curr] = table.childNodes[i].getElementsByTagName(td);
+          }
+        }
+
+        // populate res
+        if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
+	  			for (j=0; j < tds.labels.length; j++) {
+					  res.labels.push(tds.labels[j].innerHTML);
+				  }
+			  	for (j=0; j < tds.data.length; j++) {
+				  	res.data.push(tds.data[j].innerHTML);
+			  	}
+		  		for (j=0; j < tds.lines1.length; j++) {
+	  				res.lines1.push(tds.lines1[j].innerHTML);
+  				}
+  				for (j=0; j < tds.lines2.length; j++) {
+  					res.lines2.push(tds.lines2[j].innerHTML);
+  				}
+        }
 				return res;
 			} else {
 				return false;
@@ -703,7 +727,7 @@ Raphael.fn.lineChart = function(method) {
 		drawYLabels: function(elm, x, y, height, count, max, top, style) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
-				step = Math.floor(max / count),
+				step = Math.round(max / count),
 				labelHeight = (height - top - y) / count;
 			
 			// reset old labels
@@ -715,9 +739,19 @@ Raphael.fn.lineChart = function(method) {
 			
 			o.YLabels = [];
 			for (var j = 0; j <= count; j++) {
-				var l = elm.text(x,
-							height - y - (j * labelHeight),
-							j * step).attr(style);
+				var txt = (j * (max/count)),
+					l;
+				
+				if (txt < 1) {
+					txt = (txt+'').replace(/\.(\d{2})\d*/, '.$1');
+				}
+				else {
+					txt = Math.round(txt);
+				}
+				
+				l = elm.text(x,
+						height - y - (j * labelHeight),
+						txt).attr(style);
 				o.YLabels.push(l);
 			}
 		},
@@ -778,7 +812,13 @@ Raphael.fn.lineChart.defaults = {
 			font: 'bold 10px Helvetica, Arial',
 			fill: "#000000"
 		}
-	}
+	},
+  table_classes: {
+    data: 'data',
+    line1: 'line1',
+    line2: 'line2'
+  }
 };
 
 })();
+

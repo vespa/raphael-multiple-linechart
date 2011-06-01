@@ -21,7 +21,7 @@ The concept for the code is dervied from the Raphael [Analytics example][4].
 
 ## Requirements ##
 
-*		Raphael - <http://raphaeljs.com></div> 
+*		Raphael - [http://raphaeljs.com]
 
 ## Usage ##
 
