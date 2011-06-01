@@ -8,5 +8,7 @@
 *   Allow defining a custom hover function, that I would bind to the rect/circle objects.
 *   Test in IE, add "tested browsers" list to docs (so far success with Chrome, FF4, Mobile
     Safari).
+*   Fix IE bug: getElementsByClassName undefined.
 *   Allow liquid width/height (how?).
 *   Reconsider setting drawGrid and popup as Raphael plugins.
+*   X, Y axis ticks near labels
