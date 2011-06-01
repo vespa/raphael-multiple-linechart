@@ -188,7 +188,7 @@ Raphael.fn.lineChart = function(method) {
 				width = settings.width,
 				height = settings.height,
 				
-				table = helpers.getTable(o, settings.data, settings.data_holder),
+				table = helpers.getTable(element, o, settings.data, settings.data_holder),
 				size = table.labels.length,
 				
 				X = (width - gutter.left) / size,
@@ -372,7 +372,7 @@ Raphael.fn.lineChart = function(method) {
 		},
 		
 		setDataHolder: function(holder) {
-			var table = helpers.loadTableData(holder);
+			var table = helpers.loadTableData(this, holder);
 			if (table) {
 				return this.lineChart('setData', table);
 			}
@@ -396,7 +396,7 @@ Raphael.fn.lineChart = function(method) {
 				
 				p, bgpp;
 			
-			table = helpers.getTable(o, table);
+			table = helpers.getTable(element, o, table);
 			
 			if (table.labels.length != o.size) {
 				return helpers.error('New data source has to be of same size');
@@ -553,7 +553,7 @@ Raphael.fn.lineChart = function(method) {
 			};
 		},
 		
-		getTable: function(o, obj, elm) {
+		getTable: function(elm, o, obj, table_elm) {
 			if (obj) {
 				// handle multiple data rows
 				if (obj.data[0].constructor == Array) {
@@ -570,20 +570,21 @@ Raphael.fn.lineChart = function(method) {
 				}
 			}
 			else {
-				return helpers.loadTableData(elm);
+				return helpers.loadTableData(elm, table_elm);
 			}
 		},
 		
-		loadTableData: function(table_elm) {
-			var table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
-				res = {
-					labels: [],
-					data: [],
-					lines1: [],
-					lines2: []
-				},
-        tds = {},
-        curr, td, i, j;
+		loadTableData: function(elm, table_elm) {
+			var settings = elm.lineChart.settings,
+          table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
+  				res = {
+  					labels: [],
+  					data: [],
+  					lines1: [],
+  					lines2: []
+  				},
+          tds = {},
+          curr, td, i, j;
 			
 			if (table) {
         // find elements to collect
@@ -593,13 +594,13 @@ Raphael.fn.lineChart = function(method) {
             td = 'th';
           }
           else if (table.childNodes[i].tagName == 'TBODY') {
-            if (table.childNodes[i].className == 'data') {
+            if (table.childNodes[i].className == settings.table_classes.data) {
               curr = 'data';
             }
-            else if (table.childNodes[i].className == 'line1') {
+            else if (table.childNodes[i].className == settings.table_classes.line1) {
               curr = 'lines1';
             }
-            else if (table.childNodes[i].className == 'line2') {
+            else if (table.childNodes[i].className == settings.table_classes.line2) {
               curr = 'lines2';
             }
           }
@@ -811,7 +812,12 @@ Raphael.fn.lineChart.defaults = {
 			font: 'bold 10px Helvetica, Arial',
 			fill: "#000000"
 		}
-	}
+	},
+  table_classes: {
+    data: 'data',
+    line1: 'line1',
+    line2: 'line2'
+  }
 };
 
 })();
