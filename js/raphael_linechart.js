@@ -193,7 +193,7 @@ Raphael.fn.lineChart = function(method) {
 				
 				X = (width - gutter.left) / size,
 				max = Math.max.apply(Math, table.data),
-				Y = (height - gutter.bottom - gutter.top) / max,
+				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
 				
 				blanket = element.set(),
 				p,
@@ -281,7 +281,7 @@ Raphael.fn.lineChart = function(method) {
 				var dot, rect;
 
 				// calculate current x, y
-				y = Math.round(height - gutter.bottom - Y * table.data[i]);
+				y = Math.round(height - gutter.bottom - Y * table.data[i]) || 0;
 				x = Math.round(gutter.left + X * (i + 0.5));
 
 				if (!i) {
@@ -297,7 +297,7 @@ Raphael.fn.lineChart = function(method) {
 					p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
-
+        
 				//TODO allow customizing all of these
 				dot = element.circle(x, y, 4).attr({
 					fill: "#ffffff",
@@ -341,7 +341,7 @@ Raphael.fn.lineChart = function(method) {
 
 			p = p.concat([x, y, x, y]);
 			bgpp = bgpp.concat([x, y, x, y, "L", x, height - gutter.bottom, "z"]);
-			o.path.attr({
+  		o.path.attr({
 				path: p
 			});
 			o.bgp.attr({
@@ -392,7 +392,7 @@ Raphael.fn.lineChart = function(method) {
 				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
-				Y = (height - gutter.bottom - gutter.top) / max,
+				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
 				
 				p, bgpp;
 			
