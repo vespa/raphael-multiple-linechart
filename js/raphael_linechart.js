@@ -297,7 +297,7 @@ Raphael.fn.lineChart = function(method) {
 					p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
-        
+		
 				//TODO allow customizing all of these
 				dot = element.circle(x, y, 4).attr({
 					fill: "#ffffff",
@@ -341,7 +341,7 @@ Raphael.fn.lineChart = function(method) {
 
 			p = p.concat([x, y, x, y]);
 			bgpp = bgpp.concat([x, y, x, y, "L", x, height - gutter.bottom, "z"]);
-  		o.path.attr({
+			o.path.attr({
 				path: p
 			});
 			o.bgp.attr({
@@ -576,55 +576,55 @@ Raphael.fn.lineChart = function(method) {
 		
 		loadTableData: function(elm, table_elm) {
 			var settings = elm.lineChart.settings,
-          table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
-  				res = {
-  					labels: [],
-  					data: [],
-  					lines1: [],
-  					lines2: []
-  				},
-          tds = {},
-          curr, td, i, j;
+		  table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
+				res = {
+					labels: [],
+					data: [],
+					lines1: [],
+					lines2: []
+				},
+		  tds = {},
+		  curr, td, i, j;
 			
 			if (table) {
-        // find elements to collect
-        for (i=0; i < table.childNodes.length; i++, curr = null, td = 'td') {
-          if (table.childNodes[i].tagName == 'TFOOT') {
-            curr = 'labels';
-            td = 'th';
-          }
-          else if (table.childNodes[i].tagName == 'TBODY') {
-            if (table.childNodes[i].className == settings.table_classes.data) {
-              curr = 'data';
-            }
-            else if (table.childNodes[i].className == settings.table_classes.line1) {
-              curr = 'lines1';
-            }
-            else if (table.childNodes[i].className == settings.table_classes.line2) {
-              curr = 'lines2';
-            }
-          }
+		// find elements to collect
+		for (i=0; i < table.childNodes.length; i++, curr = null, td = 'td') {
+		  if (table.childNodes[i].tagName == 'TFOOT') {
+			curr = 'labels';
+			td = 'th';
+		  }
+		  else if (table.childNodes[i].tagName == 'TBODY') {
+			if (table.childNodes[i].className == settings.table_classes.data) {
+			  curr = 'data';
+			}
+			else if (table.childNodes[i].className == settings.table_classes.line1) {
+			  curr = 'lines1';
+			}
+			else if (table.childNodes[i].className == settings.table_classes.line2) {
+			  curr = 'lines2';
+			}
+		  }
 
-          if (curr) {
-            tds[curr] = table.childNodes[i].getElementsByTagName(td);
-          }
-        }
+		  if (curr) {
+			tds[curr] = table.childNodes[i].getElementsByTagName(td);
+		  }
+		}
 
-        // populate res
-        if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
-	  			for (j=0; j < tds.labels.length; j++) {
+		// populate res
+		if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
+				for (j=0; j < tds.labels.length; j++) {
 					  res.labels.push(tds.labels[j].innerHTML);
 				  }
-			  	for (j=0; j < tds.data.length; j++) {
-				  	res.data.push(tds.data[j].innerHTML);
-			  	}
-		  		for (j=0; j < tds.lines1.length; j++) {
-	  				res.lines1.push(tds.lines1[j].innerHTML);
-  				}
-  				for (j=0; j < tds.lines2.length; j++) {
-  					res.lines2.push(tds.lines2[j].innerHTML);
-  				}
-        }
+				for (j=0; j < tds.data.length; j++) {
+					res.data.push(tds.data[j].innerHTML);
+				}
+				for (j=0; j < tds.lines1.length; j++) {
+					res.lines1.push(tds.lines1[j].innerHTML);
+				}
+				for (j=0; j < tds.lines2.length; j++) {
+					res.lines2.push(tds.lines2[j].innerHTML);
+				}
+		}
 				return res;
 			} else {
 				return false;
@@ -728,7 +728,8 @@ Raphael.fn.lineChart = function(method) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
 				step = Math.round(max / count),
-				labelHeight = (height - top - y) / count;
+				labelHeight = (height - top - y) / count,
+				lastTxt;
 			
 			// reset old labels
 			if (o.YLabels.length) {
@@ -749,10 +750,13 @@ Raphael.fn.lineChart = function(method) {
 					txt = Math.round(txt);
 				}
 				
-				l = elm.text(x,
-						height - y - (j * labelHeight),
-						txt).attr(style);
-				o.YLabels.push(l);
+				if (txt != lastTxt) {
+					l = elm.text(x,
+							height - y - (j * labelHeight),
+							txt).attr(style);
+					o.YLabels.push(l);
+					lastTxt = txt;
+				}
 			}
 		},
 		
@@ -814,9 +818,9 @@ Raphael.fn.lineChart.defaults = {
 		}
 	},
   table_classes: {
-    data: 'data',
-    line1: 'line1',
-    line2: 'line2'
+	data: 'data',
+	line1: 'line1',
+	line2: 'line2'
   }
 };
 
