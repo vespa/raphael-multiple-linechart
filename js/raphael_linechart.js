@@ -407,7 +407,7 @@ Raphael.fn.lineChart = function(method) {
 					rect = o.rects[i];
 				
 				// calculate current x, y
-				y = Math.round(height - gutter.bottom - Y * table.data[i]);
+				y = Math.round(height - gutter.bottom - Y * table.data[i]) || 0;
 				x = Math.round(gutter.left + X * (i + 0.5));
 				
 				if (!i) {
@@ -420,6 +420,7 @@ Raphael.fn.lineChart = function(method) {
 						Y2 = Math.round(height - gutter.bottom - Y * table.data[i + 1]),
 						X2 = Math.round(gutter.left + X * (i + 1.5)),
 						a = helpers.getAnchors(X0, Y0, x, y, X2, Y2);
+
 					p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
@@ -535,15 +536,20 @@ Raphael.fn.lineChart = function(method) {
 				l2 = (p3x - p2x) / 2,
 				a = Math.atan((p2x - p1x) / Math.abs(p2y - p1y)),
 				b = Math.atan((p3x - p2x) / Math.abs(p2y - p3y)),
-				alpha, dx1, dy1, dx2, dy2;
+				dx1 = dy1 = dx2 = dy2 = 0,
+				alpha;
 
 			a = p1y < p2y ? Math.PI - a: a;
 			b = p3y < p2y ? Math.PI - b: b;
 			alpha = Math.PI / 2 - ((a + b) % (Math.PI * 2)) / 2;
 			dx1 = l1 * Math.sin(alpha + a);
-			dy1 = l1 * Math.cos(alpha + a);
 			dx2 = l2 * Math.sin(alpha + b);
-			dy2 = l2 * Math.cos(alpha + b);
+			if (p1y != p2y) {
+				dy1 = l1 * Math.cos(alpha + a);
+			}
+				if (p2y != p3y) {
+				dy2 = l2 * Math.cos(alpha + b);
+			}
 
 			return {
 				x1: p2x - dx1,
@@ -743,16 +749,15 @@ Raphael.fn.lineChart = function(method) {
 				var txt = (j * (max/count)),
 					l;
 
-        if (Math.floor(txt) != lastTxt) {
-          
-          txt = Math.round(txt);
-          
-          l = elm.text(x,
-              height - y - (j * labelHeight),
-              txt).attr(style);
-          o.YLabels.push(l);
+				if (Math.floor(txt) != lastTxt) {
+					txt = Math.round(txt);
 
-          lastTxt = Math.floor(txt);
+					l = elm.text(x,
+						height - y - (j * labelHeight),
+						txt).attr(style);
+					o.YLabels.push(l);
+
+					lastTxt = Math.floor(txt);
 				}
 			}
 		},
