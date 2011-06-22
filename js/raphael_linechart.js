@@ -742,20 +742,17 @@ Raphael.fn.lineChart = function(method) {
 			for (var j = 0; j <= count; j++) {
 				var txt = (j * (max/count)),
 					l;
-				
-				if (txt < 1) {
-					txt = (txt+'').replace(/\.(\d{2})\d*/, '.$1');
-				}
-				else {
-					txt = Math.round(txt);
-				}
-				
-				if (txt != lastTxt) {
-					l = elm.text(x,
-							height - y - (j * labelHeight),
-							txt).attr(style);
-					o.YLabels.push(l);
-					lastTxt = txt;
+
+        if (Math.floor(txt) != lastTxt) {
+          
+          txt = Math.round(txt);
+          
+          l = elm.text(x,
+              height - y - (j * labelHeight),
+              txt).attr(style);
+          o.YLabels.push(l);
+
+          lastTxt = Math.floor(txt);
 				}
 			}
 		},
