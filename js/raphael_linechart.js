@@ -748,8 +748,20 @@ Raphael.fn.lineChart = function(method) {
 				step = Math.round(max / count),
 				style = settings.text.axis_labels,
 				labelHeight = (height - top - y) / count,
-				lastTxt;
+				
+				display = function(txt) {
+					if (max > count) {
+						txt = Math.floor(txt) + '';
+						txt = txt.replace(/\.(\d{3})\d*/, '.$1');
+						txt = txt.replace(/(\d{1,3})(?=(?:\d{3})+$)/g,"$1,");
+						return txt;
+					}
+					else {
+						return '0.' + Math.floor(txt * 1000);
+					}
+				};
 			
+
 			// reset old labels
 			if (o.YLabels.length) {
 				for (var i = 0; i < o.YLabels.length; i++) {
@@ -757,21 +769,17 @@ Raphael.fn.lineChart = function(method) {
 				}
 			}
 			
+
 			o.YLabels = [];
 			for (var j = 0; j <= count; j++) {
 				var txt = (j * (max/count)),
 					l;
 
-				if (Math.floor(txt) != lastTxt) {
-					txt = Math.round(txt);
+				l = elm.text(x,
+					height - y - (j * labelHeight),
+					display(txt)).attr(style);
+				o.YLabels.push(l);
 
-					l = elm.text(x,
-						height - y - (j * labelHeight),
-						txt).attr(style);
-					o.YLabels.push(l);
-
-					lastTxt = Math.floor(txt);
-				}
 			}
 		},
 		
