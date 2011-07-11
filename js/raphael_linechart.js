@@ -184,22 +184,33 @@ Raphael.fn.lineChart = function(method) {
 			var element = this,
 				o = this.customAttributes.lineChart,
 				settings = this.lineChart.settings,
-				gutter = settings.gutter,
 				width = settings.width,
 				height = settings.height,
 				
 				table = helpers.getTable(element, o, settings.data, settings.data_holder),
 				size = table.labels.length,
 				
-				X = (width - gutter.left) / size,
 				max = Math.max.apply(Math, table.data),
-				Y = (height - gutter.bottom - gutter.top) / max,
+				
+				YLabelWidth = element.text(-50, -50, max).attr(settings.text.axis_labels).getBBox().width,
+				gutter = {
+					top: settings.gutter.top,
+					right: settings.gutter.right,
+					bottom: settings.gutter.bottom,
+					left: settings.gutter.left + YLabelWidth
+				},
+				
+				X = (width - gutter.left) / size,
+				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
 				
 				blanket = element.set(),
 				p,
 				bgpp,
 				x,
 				y;
+			
+			o.gutter = gutter;
+			o.labelGutter = settings.gutter.left;
 			
 			o.size = size;
 			o.dots = [];
@@ -247,17 +258,13 @@ Raphael.fn.lineChart = function(method) {
 			// draw x axis labels
 			o.XLabels = [];
 			if (settings.x_labels_step) {
-				helpers.drawXLabels(element, X, height - gutter.bottom + 18,
-						settings.x_labels_step, table.labels,
-						settings.text.axis_labels);
+				helpers.drawXLabels(element, table.labels);
 			}
 			
 			// draw y axis labels
 			o.YLabels = [];
 			if (settings.y_labels_count) {
-				helpers.drawYLabels(element, gutter.left, gutter.bottom,
-							height, settings.y_labels_count,
-							max, gutter.top, settings.text.axis_labels);
+				helpers.drawYLabels(element, max);
 			}
 
 			// prepare popup
@@ -281,7 +288,7 @@ Raphael.fn.lineChart = function(method) {
 				var dot, rect;
 
 				// calculate current x, y
-				y = Math.round(height - gutter.bottom - Y * table.data[i]);
+				y = Math.round(height - gutter.bottom - Y * table.data[i]) || 0;
 				x = Math.round(gutter.left + X * (i + 0.5));
 
 				if (!i) {
@@ -297,7 +304,7 @@ Raphael.fn.lineChart = function(method) {
 					p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
-
+		
 				//TODO allow customizing all of these
 				dot = element.circle(x, y, 4).attr({
 					fill: "#ffffff",
@@ -388,11 +395,11 @@ Raphael.fn.lineChart = function(method) {
 				o = this.customAttributes.lineChart,
 				width = settings.width,
 				height = settings.height,
-				gutter = settings.gutter,
+				gutter = o.gutter,
 				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
-				Y = (height - gutter.bottom - gutter.top) / max,
+				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
 				
 				p, bgpp;
 			
@@ -407,7 +414,7 @@ Raphael.fn.lineChart = function(method) {
 					rect = o.rects[i];
 				
 				// calculate current x, y
-				y = Math.round(height - gutter.bottom - Y * table.data[i]);
+				y = Math.round(height - gutter.bottom - Y * table.data[i]) || 0;
 				x = Math.round(gutter.left + X * (i + 0.5));
 				
 				if (!i) {
@@ -420,6 +427,7 @@ Raphael.fn.lineChart = function(method) {
 						Y2 = Math.round(height - gutter.bottom - Y * table.data[i + 1]),
 						X2 = Math.round(gutter.left + X * (i + 1.5)),
 						a = helpers.getAnchors(X0, Y0, x, y, X2, Y2);
+
 					p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
@@ -451,16 +459,12 @@ Raphael.fn.lineChart = function(method) {
 			
 			// update x axis labels
 			if (settings.x_labels_step) {
-				helpers.drawXLabels(element, X, height - gutter.bottom + 18,
-						settings.x_labels_step, table.labels,
-						settings.text.axis_labels);
+				helpers.drawXLabels(element, table.labels);
 			}
 
 			// draw y axis labels
 			if (settings.y_labels_count) {
-				helpers.drawYLabels(element, gutter.left, gutter.bottom,
-							height, settings.y_labels_count,
-							max, gutter.top, settings.text.axis_labels);
+				helpers.drawYLabels(element, max);
 			}
 		}
 		
@@ -535,15 +539,20 @@ Raphael.fn.lineChart = function(method) {
 				l2 = (p3x - p2x) / 2,
 				a = Math.atan((p2x - p1x) / Math.abs(p2y - p1y)),
 				b = Math.atan((p3x - p2x) / Math.abs(p2y - p3y)),
-				alpha, dx1, dy1, dx2, dy2;
+				dx1 = dy1 = dx2 = dy2 = 0,
+				alpha;
 
 			a = p1y < p2y ? Math.PI - a: a;
 			b = p3y < p2y ? Math.PI - b: b;
 			alpha = Math.PI / 2 - ((a + b) % (Math.PI * 2)) / 2;
 			dx1 = l1 * Math.sin(alpha + a);
-			dy1 = l1 * Math.cos(alpha + a);
 			dx2 = l2 * Math.sin(alpha + b);
-			dy2 = l2 * Math.cos(alpha + b);
+			if (p1y != p2y) {
+				dy1 = l1 * Math.cos(alpha + a);
+			}
+				if (p2y != p3y) {
+				dy2 = l2 * Math.cos(alpha + b);
+			}
 
 			return {
 				x1: p2x - dx1,
@@ -576,55 +585,55 @@ Raphael.fn.lineChart = function(method) {
 		
 		loadTableData: function(elm, table_elm) {
 			var settings = elm.lineChart.settings,
-          table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
-  				res = {
-  					labels: [],
-  					data: [],
-  					lines1: [],
-  					lines2: []
-  				},
-          tds = {},
-          curr, td, i, j;
+		  table = (table_elm && table_elm.constructor == String) ? document.getElementById(table_elm) : table_elm,
+				res = {
+					labels: [],
+					data: [],
+					lines1: [],
+					lines2: []
+				},
+		  tds = {},
+		  curr, td, i, j;
 			
 			if (table) {
-        // find elements to collect
-        for (i=0; i < table.childNodes.length; i++, curr = null, td = 'td') {
-          if (table.childNodes[i].tagName == 'TFOOT') {
-            curr = 'labels';
-            td = 'th';
-          }
-          else if (table.childNodes[i].tagName == 'TBODY') {
-            if (table.childNodes[i].className == settings.table_classes.data) {
-              curr = 'data';
-            }
-            else if (table.childNodes[i].className == settings.table_classes.line1) {
-              curr = 'lines1';
-            }
-            else if (table.childNodes[i].className == settings.table_classes.line2) {
-              curr = 'lines2';
-            }
-          }
+		// find elements to collect
+		for (i=0; i < table.childNodes.length; i++, curr = null, td = 'td') {
+		  if (table.childNodes[i].tagName == 'TFOOT') {
+			curr = 'labels';
+			td = 'th';
+		  }
+		  else if (table.childNodes[i].tagName == 'TBODY') {
+			if (table.childNodes[i].className == settings.table_classes.data) {
+			  curr = 'data';
+			}
+			else if (table.childNodes[i].className == settings.table_classes.line1) {
+			  curr = 'lines1';
+			}
+			else if (table.childNodes[i].className == settings.table_classes.line2) {
+			  curr = 'lines2';
+			}
+		  }
 
-          if (curr) {
-            tds[curr] = table.childNodes[i].getElementsByTagName(td);
-          }
-        }
+		  if (curr) {
+			tds[curr] = table.childNodes[i].getElementsByTagName(td);
+		  }
+		}
 
-        // populate res
-        if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
-	  			for (j=0; j < tds.labels.length; j++) {
+		// populate res
+		if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
+				for (j=0; j < tds.labels.length; j++) {
 					  res.labels.push(tds.labels[j].innerHTML);
 				  }
-			  	for (j=0; j < tds.data.length; j++) {
-				  	res.data.push(tds.data[j].innerHTML);
-			  	}
-		  		for (j=0; j < tds.lines1.length; j++) {
-	  				res.lines1.push(tds.lines1[j].innerHTML);
-  				}
-  				for (j=0; j < tds.lines2.length; j++) {
-  					res.lines2.push(tds.lines2[j].innerHTML);
-  				}
-        }
+				for (j=0; j < tds.data.length; j++) {
+					res.data.push(tds.data[j].innerHTML);
+				}
+				for (j=0; j < tds.lines1.length; j++) {
+					res.lines1.push(tds.lines1[j].innerHTML);
+				}
+				for (j=0; j < tds.lines2.length; j++) {
+					res.lines2.push(tds.lines2[j].innerHTML);
+				}
+		}
 				return res;
 			} else {
 				return false;
@@ -700,9 +709,13 @@ Raphael.fn.lineChart = function(method) {
 			rect.hover(f_in, f_out);
 		},
 		
-		drawXLabels: function(elm, x, y, step, labels, style) {
+		drawXLabels: function(elm, labels) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
+				x = (settings.width - o.gutter.left) / o.size,
+				y = settings.height - o.gutter.bottom + 18,
+				step = settings.x_labels_step,
+				style = settings.text.axis_labels,
 				i;
 			
 			// reset old labels
@@ -714,7 +727,7 @@ Raphael.fn.lineChart = function(method) {
 	
 			o.XLabels = [];
 			for (i = 0; i < o.size; i++) {
-				var label_x = Math.round(settings.gutter.left + x * (i + 0.5));
+				var label_x = Math.round(o.gutter.left + x * (i + 0.5));
 				
 				if (i % step === 0) {
 					var l = elm.text(label_x, y, labels[i])
@@ -724,11 +737,18 @@ Raphael.fn.lineChart = function(method) {
 			}
 		},
 		
-		drawYLabels: function(elm, x, y, height, count, max, top, style) {
+		drawYLabels: function(elm, max) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
+				x = o.labelGutter + 20,
+				y = o.gutter.bottom,
+				top = o.gutter.top,
+				height = settings.height,
+				count = settings.y_labels_count,
 				step = Math.round(max / count),
-				labelHeight = (height - top - y) / count;
+				style = settings.text.axis_labels,
+				labelHeight = (height - top - y) / count,
+				lastTxt;
 			
 			// reset old labels
 			if (o.YLabels.length) {
@@ -741,18 +761,17 @@ Raphael.fn.lineChart = function(method) {
 			for (var j = 0; j <= count; j++) {
 				var txt = (j * (max/count)),
 					l;
-				
-				if (txt < 1) {
-					txt = (txt+'').replace(/\.(\d{2})\d*/, '.$1');
-				}
-				else {
+
+				if (Math.floor(txt) != lastTxt) {
 					txt = Math.round(txt);
-				}
-				
-				l = elm.text(x,
+
+					l = elm.text(x,
 						height - y - (j * labelHeight),
 						txt).attr(style);
-				o.YLabels.push(l);
+					o.YLabels.push(l);
+
+					lastTxt = Math.floor(txt);
+				}
 			}
 		},
 		
@@ -814,9 +833,9 @@ Raphael.fn.lineChart.defaults = {
 		}
 	},
   table_classes: {
-    data: 'data',
-    line1: 'line1',
-    line2: 'line2'
+	data: 'data',
+	line1: 'line1',
+	line2: 'line2'
   }
 };
 
