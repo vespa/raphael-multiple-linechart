@@ -184,15 +184,23 @@ Raphael.fn.lineChart = function(method) {
 			var element = this,
 				o = this.customAttributes.lineChart,
 				settings = this.lineChart.settings,
-				gutter = settings.gutter,
 				width = settings.width,
 				height = settings.height,
 				
 				table = helpers.getTable(element, o, settings.data, settings.data_holder),
 				size = table.labels.length,
 				
-				X = (width - gutter.left) / size,
 				max = Math.max.apply(Math, table.data),
+				
+				YLabelWidth = element.text(-50, -50, max).attr(settings.text.axis_labels).getBBox().width,
+				gutter = {
+					top: settings.gutter.top,
+					right: settings.gutter.right,
+					bottom: settings.gutter.bottom,
+					left: settings.gutter.left + YLabelWidth
+				},
+				
+				X = (width - gutter.left) / size,
 				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
 				
 				blanket = element.set(),
@@ -200,6 +208,9 @@ Raphael.fn.lineChart = function(method) {
 				bgpp,
 				x,
 				y;
+			
+			o.gutter = gutter;
+			o.labelGutter = settings.gutter.left;
 			
 			o.size = size;
 			o.dots = [];
@@ -247,17 +258,13 @@ Raphael.fn.lineChart = function(method) {
 			// draw x axis labels
 			o.XLabels = [];
 			if (settings.x_labels_step) {
-				helpers.drawXLabels(element, X, height - gutter.bottom + 18,
-						settings.x_labels_step, table.labels,
-						settings.text.axis_labels);
+				helpers.drawXLabels(element, table.labels);
 			}
 			
 			// draw y axis labels
 			o.YLabels = [];
 			if (settings.y_labels_count) {
-				helpers.drawYLabels(element, gutter.left, gutter.bottom,
-							height, settings.y_labels_count,
-							max, gutter.top, settings.text.axis_labels);
+				helpers.drawYLabels(element, max);
 			}
 
 			// prepare popup
@@ -388,7 +395,7 @@ Raphael.fn.lineChart = function(method) {
 				o = this.customAttributes.lineChart,
 				width = settings.width,
 				height = settings.height,
-				gutter = settings.gutter,
+				gutter = o.gutter,
 				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
@@ -452,16 +459,12 @@ Raphael.fn.lineChart = function(method) {
 			
 			// update x axis labels
 			if (settings.x_labels_step) {
-				helpers.drawXLabels(element, X, height - gutter.bottom + 18,
-						settings.x_labels_step, table.labels,
-						settings.text.axis_labels);
+				helpers.drawXLabels(element, table.labels);
 			}
 
 			// draw y axis labels
 			if (settings.y_labels_count) {
-				helpers.drawYLabels(element, gutter.left, gutter.bottom,
-							height, settings.y_labels_count,
-							max, gutter.top, settings.text.axis_labels);
+				helpers.drawYLabels(element, max);
 			}
 		}
 		
@@ -706,9 +709,13 @@ Raphael.fn.lineChart = function(method) {
 			rect.hover(f_in, f_out);
 		},
 		
-		drawXLabels: function(elm, x, y, step, labels, style) {
+		drawXLabels: function(elm, labels) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
+				x = (settings.width - o.gutter.left) / o.size,
+				y = settings.height - o.gutter.bottom + 18,
+				step = settings.x_labels_step,
+				style = settings.text.axis_labels,
 				i;
 			
 			// reset old labels
@@ -720,7 +727,7 @@ Raphael.fn.lineChart = function(method) {
 	
 			o.XLabels = [];
 			for (i = 0; i < o.size; i++) {
-				var label_x = Math.round(settings.gutter.left + x * (i + 0.5));
+				var label_x = Math.round(o.gutter.left + x * (i + 0.5));
 				
 				if (i % step === 0) {
 					var l = elm.text(label_x, y, labels[i])
@@ -730,10 +737,16 @@ Raphael.fn.lineChart = function(method) {
 			}
 		},
 		
-		drawYLabels: function(elm, x, y, height, count, max, top, style) {
+		drawYLabels: function(elm, max) {
 			var settings = elm.lineChart.settings,
 				o = elm.customAttributes.lineChart,
+				x = o.labelGutter + 20,
+				y = o.gutter.bottom,
+				top = o.gutter.top,
+				height = settings.height,
+				count = settings.y_labels_count,
 				step = Math.round(max / count),
+				style = settings.text.axis_labels,
 				labelHeight = (height - top - y) / count,
 				lastTxt;
 			
