@@ -199,16 +199,18 @@ Raphael.fn.lineChart = function(method) {
 					bottom: settings.gutter.bottom,
 					left: settings.gutter.left + YLabelWidth
 				},
-				
-				X = (width - gutter.left) / size,
-				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
-				
 				blanket = element.set(),
-				p,
-				bgpp,
-				x,
-				y;
-			
+
+				X = (width - gutter.left) / size,
+				Y, p, bgpp, x, y;
+
+			// fix max. value
+			if (max > settings.y_labels_count*10) {
+				p = 25*settings.y_labels_count;
+				max = Math.ceil(max/p)*p;
+			}
+			Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0;
+
 			o.gutter = gutter;
 			o.labelGutter = settings.gutter.left;
 			
@@ -399,15 +401,20 @@ Raphael.fn.lineChart = function(method) {
 				
 				X = (width - gutter.left) / table.labels.length,
 				max = Math.max.apply(Math, table.data),
-				Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0,
-				
-				p, bgpp;
+				Y, p, bgpp;
 			
 			table = helpers.getTable(element, o, table);
 			
 			if (table.labels.length != o.size) {
 				return helpers.error('New data source has to be of same size');
 			}
+
+			// fix max. value
+			if (max > settings.y_labels_count*10) {
+				p = 25*settings.y_labels_count;
+				max = Math.ceil(max/p)*p;
+			}
+			Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0;
 			
 			for (var i = 0, ii = table.labels.length; i < ii; i++) {
 				var dot = o.dots[i],
@@ -746,21 +753,7 @@ Raphael.fn.lineChart = function(method) {
 				height = settings.height,
 				count = settings.y_labels_count,
 				step = Math.round(max / count),
-				style = settings.text.axis_labels,
-				labelHeight = (height - top - y) / count,
-				
-				display = function(txt) {
-					if (max > count) {
-						txt = Math.floor(txt) + '';
-						txt = txt.replace(/\.(\d{3})\d*/, '.$1');
-						txt = txt.replace(/(\d{1,3})(?=(?:\d{3})+$)/g,"$1,");
-						return txt;
-					}
-					else {
-						return '0.' + Math.floor(txt * 1000);
-					}
-				};
-			
+				labelHeight = (height - top - y) / count;
 
 			// reset old labels
 			if (o.YLabels.length) {
@@ -775,9 +768,10 @@ Raphael.fn.lineChart = function(method) {
 				var txt = (j * (max/count)),
 					l;
 
-				l = elm.text(x,
-					height - y - (j * labelHeight),
-					display(txt)).attr(style);
+				l = elm
+							.text(x, height - y - (j*labelHeight),
+                    settings.y_labels_format(txt, max, count))
+							.attr(settings.text.axis_labels);
 				o.YLabels.push(l);
 
 			}
@@ -817,6 +811,17 @@ Raphael.fn.lineChart.defaults = {
 	no_grid: false,			// whether to display background grid
 	x_labels_step: false,	// X axis: either false or a step integer
 	y_labels_count: false,	// Y axis: either false or a labels count
+	y_labels_format: function(txt, max, count) { // function to handle display of Y labels
+		if (max > count) {
+			txt = Math.floor(txt) + '';
+			txt = txt.replace(/\.(\d{3})\d*/, '.$1');
+			txt = txt.replace(/(\d{1,3})(?=(?:\d{3})+$)/g,"$1,");
+			return txt;
+		}
+		else {
+			return '0.' + Math.floor(txt * 1000);
+		}
+	},
 	animation: {			// animation (on data source change) settings
 		speed: 600,
 		easing: "backOut"
