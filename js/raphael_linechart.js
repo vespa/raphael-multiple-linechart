@@ -814,13 +814,13 @@ Raphael.fn.lineChart.defaults = {
 	y_labels_format: function(txt, max, count) { // function to handle display of Y labels
 		if (max > count) {
 			txt = Math.floor(txt) + '';
-			txt = txt.replace(/\.(\d{3})\d*/, '.$1');
-			txt = txt.replace(/(\d{1,3})(?=(?:\d{3})+$)/g,"$1,");
-			return txt;
 		}
 		else {
-			return '0.' + Math.floor(txt * 1000);
+      txt = txt + '';
 		}
+    txt = txt.replace(/\.(\d{3})\d*/, '.$1');
+    txt = txt.replace(/(\d{1,3})(?=(?:\d{3})+$)/g,"$1,");
+    return txt;
 	},
 	animation: {			// animation (on data source change) settings
 		speed: 600,
