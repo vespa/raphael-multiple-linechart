@@ -106,7 +106,7 @@ data = {
 <script type="text/javascript">
    window.onload = function(){
       var w = 840; // you can make this dynamic so it fits as you would like
-      var paper = Raphael('line-chart', w, 250); // init the raphael obj and give it a width plus height
+      var paper = Raphael('line-chart-holder', w, 250); // init the raphael obj and give it a width plus height
       paper.lineChart({
          data_holder: 'd2', // find the table data source by id
          width: w, // pass in the same width
