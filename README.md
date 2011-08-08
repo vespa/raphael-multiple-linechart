@@ -151,6 +151,7 @@ The ```lineChart()``` plugin will accept a list of arguments in a json style for
 var opts = {
 		data_holder: null, // table element holding the data to display
 		data: null,        // or the data object itself
+		data_index: 0,     // index of initial data array to use
 		width: 500,
 		height: 250,
 		// chart gutter dimension

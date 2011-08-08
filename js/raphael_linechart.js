@@ -570,15 +570,17 @@ Raphael.fn.lineChart = function(method) {
 		},
 		
 		getTable: function(elm, o, obj, table_elm) {
+			var settings = elm.lineChart.settings,
+					i = settings.data_index;
 			if (obj) {
 				// handle multiple data rows
-				if (obj.data[0].constructor == Array) {
+				if (obj.data[i].constructor == Array) {
 					o.dataArray = obj;
 					var one = {};
 					one.labels = obj.labels;
-					one.data = obj.data[0];
-					one.lines1 = obj.lines1[0];
-					one.lines2 = obj.lines2[0];
+					one.data = obj.data[i];
+					one.lines1 = obj.lines1[i];
+					one.lines2 = obj.lines2[i];
 					return one;
 				}
 				else {
@@ -798,6 +800,7 @@ Raphael.fn.lineChart = function(method) {
 Raphael.fn.lineChart.defaults = {
 	data_holder: null,		// table element holding the data to display
 	data: null,				// alternatively, supply a data object
+	data_index: 0,    // index of initial data array to use
 	width: 500,				// chart width
 	height: 250,			// chart height
 	gutter: {				// gutter dimensions
