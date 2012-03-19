@@ -307,7 +307,7 @@ Raphael.fn.lineChart = function(method) {
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
 
-				if(settings.no_dot)
+				if(!settings.no_dot)
 				{
 					//TODO allow customizing all of these
 					dot = element.circle(x, y, 4).attr({
