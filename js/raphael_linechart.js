@@ -307,46 +307,52 @@ Raphael.fn.lineChart = function(method) {
 					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
 				}
 
-				//TODO allow customizing all of these
-				dot = element.circle(x, y, 4).attr({
-					fill: "#ffffff",
-					stroke: settings.colors.master,
-					"stroke-width": 2
-				});
-				if (y === 0) {
-					dot.attr({
-						opacity: 0
+				if(settings.no_dot)
+				{
+					//TODO allow customizing all of these
+					dot = element.circle(x, y, 4).attr({
+						fill: "#ffffff",
+						stroke: settings.colors.master,
+						"stroke-width": 2
 					});
+					if (y === 0) {
+						dot.attr({
+							opacity: 0
+						});
+					}
+
+					o.dots.push(dot);
+
+					if(settings.mouse_coords)
+					{
+						if (settings.mouse_coords == 'circle') {
+							blanket.push(element.circle(x, y, 14).attr({
+								stroke: "none",
+								fill: "#fff",
+								opacity: 0
+							}));
+						} else if (settings.mouse_coords == 'rect') {
+							blanket.push(element.rect(gutter.left + X * i, 0, X, height - gutter.bottom).attr({
+								stroke: "none",
+								fill: "#fff",
+								opacity: 0
+							}));
+						}
+						rect = blanket[blanket.length - 1];
+
+						o.rects.push(rect);
+
+						o.info.push({
+							x: x,
+							y: y,
+							data: table.data[i],
+							label: table.labels[i],
+							line1: table.lines1[i],
+							line2: table.lines2[i]
+						});
+						helpers.bindHoverEvent(this, i, dot, rect, o.frame, o.label);
+					}
 				}
-
-				o.dots.push(dot);
-
-				if (settings.mouse_coords == 'circle') {
-					blanket.push(element.circle(x, y, 14).attr({
-						stroke: "none",
-						fill: "#fff",
-						opacity: 0
-					}));
-				} else if (settings.mouse_coords == 'rect') {
-					blanket.push(element.rect(gutter.left + X * i, 0, X, height - gutter.bottom).attr({
-						stroke: "none",
-						fill: "#fff",
-						opacity: 0
-					}));
-				}
-				rect = blanket[blanket.length - 1];
-
-				o.rects.push(rect);
-
-				o.info.push({
-					x: x,
-					y: y,
-					data: table.data[i],
-					label: table.labels[i],
-					line1: table.lines1[i],
-					line2: table.lines2[i]
-				});
-				helpers.bindHoverEvent(this, i, dot, rect, o.frame, o.label);
 			}
 
 			p = p.concat([x, y, x, y]);
@@ -814,7 +820,8 @@ Raphael.fn.lineChart.defaults = {
 		left: 30
 	},
 	show_area: false,		// whether to fill the area below the line
-	mouse_coords: 'rect',	// way to capture mouse events
+	no_dot: false,			// no dot on the graph
+	mouse_coords: 'rect',	// way to capture mouse events, false for no mouse events
 	no_grid: false,			// whether to display background grid
 	x_labels_step: false,	// X axis: either false or a step integer
 	y_labels_count: false,	// Y axis: either false or a labels count
