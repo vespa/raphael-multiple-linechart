@@ -323,35 +323,24 @@ Raphael.fn.lineChart = function(method) {
 
           o.dots.push(dot);
 
-          if(settings.mouse_coords)
-          {
-            if (settings.mouse_coords == 'circle') {
-              blanket.push(element.circle(x, y, 14).attr({
-                stroke: "none",
-                fill: "#fff",
-                opacity: 0
-              }));
-            } else if (settings.mouse_coords == 'rect') {
-              blanket.push(element.rect(gutter.left + X * i, 0, X, height - gutter.bottom).attr({
-                stroke: "none",
-                fill: "#fff",
-                opacity: 0
-              }));
-            }
-            rect = blanket[blanket.length - 1];
+          blanket.push(element.rect(gutter.left + X * i, 0, X, height - gutter.bottom).attr({
+            stroke: "none",
+            fill: "#fff",
+            opacity: 0
+          }));
+          rect = blanket[blanket.length - 1];
 
-            o.rects.push(rect);
+          o.rects.push(rect);
 
-            o.info.push({
-              x: x,
-              y: y,
-              data: table.data[i],
-              label: table.labels[i],
-              line1: table.lines1[i],
-              line2: table.lines2[i]
-            });
-            helpers.bindHoverEvent(this, i, dot, rect, o.frame, o.label);
-          }
+          o.info.push({
+            x: x,
+            y: y,
+            data: table.data[i],
+            label: table.labels[i],
+            line1: table.lines1[i],
+            line2: table.lines2[i]
+          });
+          helpers.bindHoverEvent(this, i, dot, rect, o.frame, o.label);
         }
       }
 
@@ -670,42 +659,25 @@ Raphael.fn.lineChart = function(method) {
             side = "left";
           }
           var ppp = elm.popup(x, y, label, side, 1);
-          if (settings.mouse_coords == 'circle') {
-            frame.attr({
-              path: ppp.path,
-              width: '200px'
-            }).show();
-            label[0].attr({
-              text: info.line1,
-              fill: settings.colors.line1,
-              translation: [ppp.dx, ppp.dy]
-            }).show();
-            label[1].attr({
-              text: info.line2,
-              fill: settings.colors.line2,
-              translation: [ppp.dx, ppp.dy]
-            }).show();
-          } else if (settings.mouse_coords == 'rect') {
-            var anim = Raphael.animation({
-              path: ppp.path,
-              transform: ["t", ppp.dx, ppp.dy]
-            }, 200 * o.is_label_visible);
+          var anim = Raphael.animation({
+            path: ppp.path,
+            transform: ["t", ppp.dx, ppp.dy]
+          }, 200 * o.is_label_visible);
 
-            lx = label[0].transform()[0][1] + ppp.dx;
-            ly = label[0].transform()[0][2] + ppp.dy;
-            frame.show().stop().animate(anim);
-            label[0].attr({
-              text: info.line1
-            }).show().stop().animateWith(frame, anim, {
-              transform: ["t", lx, ly]
-            }, 200 * o.is_label_visible);
+          lx = label[0].transform()[0][1] + ppp.dx;
+          ly = label[0].transform()[0][2] + ppp.dy;
+          frame.show().stop().animate(anim);
+          label[0].attr({
+            text: info.line1
+          }).show().stop().animateWith(frame, anim, {
+            transform: ["t", lx, ly]
+          }, 200 * o.is_label_visible);
 
-            label[1].attr({
-              text: info.line2
-            }).show().stop().animateWith(frame, anim, {
-              transform: ["t", lx, ly]
-            }, 200 * o.is_label_visible);
-          }
+          label[1].attr({
+            text: info.line2
+          }).show().stop().animateWith(frame, anim, {
+            transform: ["t", lx, ly]
+          }, 200 * o.is_label_visible);
           frame.toFront();
           label[0].toFront();
           label[1].toFront();
@@ -821,7 +793,6 @@ Raphael.fn.lineChart.defaults = {
   },
   show_area: false,    // whether to fill the area below the line
   no_dot: false,      // no dot on the graph
-  mouse_coords: 'rect',  // way to capture mouse events, false for no mouse events
   no_grid: false,      // whether to display background grid
   x_labels_step: false,  // X axis: either false or a step integer
   y_labels_count: false,  // Y axis: either false or a labels count
