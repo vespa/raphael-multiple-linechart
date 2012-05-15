@@ -1,7 +1,7 @@
 /*
- * Raphael Line Chart 1.2 - Raphael Line Charts plugin
+ * Raphael Line Chart 1.3 - Raphael Line Charts plugin
  *
- * Copyright (c) 2011 Sagie Maoz (http://sagie.maoz.info)
+ * Copyright (c) 2021 Sagie Maoz (http://sagie.maoz.info)
  * Dual-licensed under the GPL (http://www.opensource.org/licenses/gpl-3.0)
  * and the MIT (http://www.opensource.org/licenses/mit-license) licenses.
  */
