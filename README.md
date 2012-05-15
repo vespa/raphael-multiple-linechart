@@ -106,7 +106,7 @@ data = {
 <script type="text/javascript">
    window.onload = function(){
       var w = 840; // you can make this dynamic so it fits as you would like
-      var paper = Raphael('line-chart', w, 250); // init the raphael obj and give it a width plus height
+      var paper = Raphael('line-chart-holder', w, 250); // init the raphael obj and give it a width plus height
       paper.lineChart({
          data_holder: 'd2', // find the table data source by id
          width: w, // pass in the same width
@@ -151,6 +151,7 @@ The ```lineChart()``` plugin will accept a list of arguments in a json style for
 var opts = {
 		data_holder: null, // table element holding the data to display
 		data: null,        // or the data object itself
+		data_index: 0,     // index of initial data array to use
 		width: 500,
 		height: 250,
 		// chart gutter dimension
