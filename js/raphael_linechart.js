@@ -406,7 +406,7 @@ Raphael.fn.lineChart = function(method) {
       }
 
       // fix max. value
-      if (max > settings.y_labels_count*10) {
+      if (settings.y_labels_count && max > settings.y_labels_count*10) {
         p = 25*settings.y_labels_count;
         max = Math.ceil(max/p)*p;
       }
