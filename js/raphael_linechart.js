@@ -5,6 +5,7 @@
  * Dual-licensed under the GPL (http://www.opensource.org/licenses/gpl-3.0)
  * and the MIT (http://www.opensource.org/licenses/mit-license) licenses.
  */
+
 (function() {
 
 // modified version of Raphael.fn.drawGrid() from the Raphael Analytics example
@@ -136,6 +137,7 @@ Raphael.fn.popup = function (X, Y, set, pos, ret) {
             dy = 0,
             out = this.path(fill(shapes[pos[0]], mask)).insertBefore(set);
 
+
         switch (pos[0]) {
             case "top":
                 dx = X - (x + r + mask.left + gap);
@@ -155,6 +157,7 @@ Raphael.fn.popup = function (X, Y, set, pos, ret) {
             break;
         }
         out.translate(dx, dy);
+
         if (ret) {
             ret = out.attr("path");
             out.remove();
@@ -190,7 +193,6 @@ Raphael.fn.lineChart = function(method) {
         size = table.labels.length,
 
         max = Math.max.apply(Math, table.data),
-
         YLabelWidth = element.text(-50, -50, max).attr(settings.text.axis_labels).getBBox().width,
         gutter = {
           top: settings.gutter.top,
@@ -203,13 +205,23 @@ Raphael.fn.lineChart = function(method) {
         X = (width - gutter.left) / size,
         Y, p, bgpp, x, y;
 
-      // fix max. value
       if (settings.y_labels_count && max > settings.y_labels_count*10) {
         p = 25*settings.y_labels_count;
         max = Math.ceil(max/p)*p;
       }
-      Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0;
 
+		//// Altered this guy to use the heigth of the biggest data at the table
+		Y = max ? ((height - gutter.bottom - gutter.top) / max) : 0;
+
+		// ask if multiple charts are active
+		if(typeof $mc != "undefined"){
+			if ($mc.settedY) {
+				Y = $mc.settedY;
+			} else{
+				$mc.settedY = Y;
+			}
+		};
+	  
       o.gutter = gutter;
       o.labelGutter = settings.gutter.left;
 
@@ -218,6 +230,7 @@ Raphael.fn.lineChart = function(method) {
       o.rects = [];
       o.info = [];
       //TODO allow customizing
+
       o.path = element.path().attr({
         stroke: settings.colors.master,
         "stroke-width": 4,
@@ -225,6 +238,7 @@ Raphael.fn.lineChart = function(method) {
       });
       // chart area
       //TODO allow customizing
+
       if (settings.show_area) {
         o.bgp = element.path().attr({
           stroke: "none",
@@ -260,6 +274,7 @@ Raphael.fn.lineChart = function(method) {
       // draw x axis labels
       o.XLabels = [];
       if (settings.x_labels_step) {
+		
         helpers.drawXLabels(element, table.labels);
       }
 
@@ -305,6 +320,7 @@ Raphael.fn.lineChart = function(method) {
             a = helpers.getAnchors(X0, Y0, x, y, X2, Y2);
           p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
           bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+
         }
 
         if(!settings.no_dot)
@@ -323,6 +339,9 @@ Raphael.fn.lineChart = function(method) {
 
           o.dots.push(dot);
 
+/* there's no more the rect item. The event popup now is associated with the dot */
+
+/*
           blanket.push(element.rect(gutter.left + X * i, 0, X, height - gutter.bottom).attr({
             stroke: "none",
             fill: "#fff",
@@ -331,13 +350,14 @@ Raphael.fn.lineChart = function(method) {
           rect = blanket[blanket.length - 1];
 
           o.rects.push(rect);
-
+*/
           o.info.push({
             x: x,
             y: y,
             data: table.data[i],
             label: table.labels[i],
-            line1: table.lines1[i],
+			//rever
+            line1: table.data[i]+ " "+settings.typeData,
             line2: table.lines2[i]
           });
           helpers.bindHoverEvent(this, i, dot, rect, o.frame, o.label);
@@ -345,10 +365,12 @@ Raphael.fn.lineChart = function(method) {
       }
 
       p = p.concat([x, y, x, y]);
+
       bgpp = bgpp.concat([x, y, x, y, "L", x, height - gutter.bottom, "z"]);
       o.path.attr({
         path: p
       });
+
       o.bgp.attr({
         path: bgpp
       });
@@ -414,7 +436,7 @@ Raphael.fn.lineChart = function(method) {
 
       for (var i = 0, ii = table.labels.length; i < ii; i++) {
         var dot = o.dots[i],
-          rect = o.rects[i];
+       //   rect = o.rects[i];
 
         // calculate current x, y
         y = Math.round(height - gutter.bottom - Y * table.data[i]) || 0;
@@ -440,13 +462,12 @@ Raphael.fn.lineChart = function(method) {
           settings.animation.easing);
 
         // new popup data
-
         o.info[i] = {
           x: x,
           y: y,
           data: table.data[i],
           label: table.labels[i],
-          line1: table.lines1[i],
+          line1: table.data[i] + " "+settings.typeData,
           line2: table.lines2[i]
         };
       }
@@ -611,9 +632,9 @@ Raphael.fn.lineChart = function(method) {
           if (table.childNodes[i].className == settings.table_classes.data) {
             curr = 'data';
           }
-          else if (table.childNodes[i].className == settings.table_classes.line1) {
-            curr = 'lines1';
-          }
+     	// else if (table.childNodes[i].className == settings.table_classes.line1) {
+       //     curr = 'lines1';
+        //  }
           else if (table.childNodes[i].className == settings.table_classes.line2) {
             curr = 'lines2';
           }
@@ -625,21 +646,25 @@ Raphael.fn.lineChart = function(method) {
         }
 
         // populate res
-        if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
+		//  if (tds.labels && tds.data && tds.lines1 && tds.lines2) {
+			
+        if (tds.labels && tds.data && tds.lines2) {
           for (j=0; j < tds.labels.length; j++) {
               res.labels.push(tds.labels[j].innerHTML);
           }
           for (j=0; j < tds.data.length; j++) {
             res.data.push(tds.data[j].innerHTML);
           }
-          for (j=0; j < tds.lines1.length; j++) {
-            res.lines1.push(tds.lines1[j].innerHTML);
+		// modified because the old one need duplicated data for generate the graph. Now, It uses the same source
+          for (j=0; j < tds.lines2.length; j++) {
+            res.lines1.push(tds.lines2[j].innerHTML);
           }
           for (j=0; j < tds.lines2.length; j++) {
             res.lines2.push(tds.lines2[j].innerHTML);
           }
         }
         return res;
+
       } else {
         return false;
       }
@@ -649,6 +674,7 @@ Raphael.fn.lineChart = function(method) {
       var settings = elm.lineChart.settings,
         o = elm.customAttributes.lineChart,
         f_in = function() {
+	
           var side = "right",
             info = o.info[i],
             x = info.x,
@@ -685,19 +711,20 @@ Raphael.fn.lineChart = function(method) {
           dot.attr("r", 6);
           o.is_label_visible = true;
         },
+		// modified for support concorrent datas
         f_out = function() {
           dot.attr("r", 4);
 
-          elm.leave_timer = window.setTimeout(function() {
+//          elm.leave_timer = window.setTimeout(function() {
             frame.hide();
             label[0].hide();
             label[1].hide();
             o.is_label_visible = false;
-          },
-          1);
+         // }//,
+       //   1);
         }
-
-      rect.hover(f_in, f_out);
+		dot.hover(f_in, f_out);
+      //rect.hover(f_in, f_out);
     },
 
     drawXLabels: function(elm, labels) {
@@ -785,6 +812,7 @@ Raphael.fn.lineChart.defaults = {
   data_index: 0,    // index of initial data array to use
   width: 500,        // chart width
   height: 250,      // chart height
+  typeData: "",
   gutter: {        // gutter dimensions
     top: 20,
     right: 0,

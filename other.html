@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>Raphaël Line Charts Plugin</title>
+
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="css/demo.css" media="screen">
+
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+  <script type="text/javascript" src="js/raphael_linechart.js"></script>
+
+  <script type="text/javascript">
+    window.onload = function(){
+      var w = 840;
+      var h1 = Raphael('chart1', w, 250);
+      var h1_source = 'd1';
+      var h2 = Raphael('chart2', w, 250);
+      var h3 = Raphael('chart3', w, 250);
+      var h4 = Raphael('chart4', w, 250);
+      h1.lineChart({
+        data_holder: h1_source,
+        width: w,
+        show_area: true,
+        mouse_coords: 'rect',
+        x_labels_step: 3,
+        y_labels_count: 5,
+        colors: {
+          master: '#d90000'
+        }
+      });
+      h2.lineChart({
+        data_holder: 'd2',
+        width: w,
+        show_area: true,
+        mouse_coords: 'rect',
+        colors: {
+          master: '#01A8F0'
+        }
+      });
+      h2.lineChart({
+        data_holder: 'd1',
+        width: w,
+        show_area: true,
+        mouse_coords: 'rect',
+        colors: {
+          master: '#8fd100'
+        }
+      });
+      h3.lineChart({
+        data_holder: 'd2',
+        width: w,
+        show_area: false,
+        x_labels_step: 3,
+        y_labels_count: 5,
+        mouse_coords: 'rect',
+        colors: {
+          master: '#d90000'
+        }
+      });
+      h4.lineChart({
+        data_holder: 'd1',
+        width: w,
+        show_area: false,
+        colors: {
+          master: '#cacaca'
+        }
+      });
+      h4.lineChart({
+        data_holder: 'd2',
+        width: w,
+        show_area: false,
+        colors: {
+          master: '#989898'
+        }
+      });
+
+      change_h1 = function() {
+        h1_source = h1_source == 'd1' ? 'd2' : 'd1';
+        h1.lineChart('setDataHolder', h1_source);
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <div id="main">
+
+    <div>
+
+      <h1>Raphaël Line Charts Plugin</h1>
+
+      <p>
+        This plugin is a result of frustration from current client-side charting solutions.<br/>
+        I needed something simple that would draw a line chart in SVG based on a table in a page,
+        be customizable enough and allow me to change the data set on demand.
+        I couldn't find one.<br/>
+        So here goes.
+      </p>
+
+      <p>
+        This plugin relies heavily on the wonderful <a href="http://raphaeljs.com/">Raphaël</a>
+        JavaScript SVG library.<br/>
+        It is also a (quite extensive) fork of
+        <a href="https://github.com/wes/Beautiful-Analytics-Chart">we's Beautiful Analytics Chart</a> project.
+      </p>
+
+      <p>
+        To download and contribute (please do!), check out the
+        <a href="https://github.com/n0nick/raphael-linechart">project on GitHub</a>.
+      </p>
+
+    </div>
+
+    <div class="box">
+      <div class="inner">
+        <div id="chart1"></div>
+        <button onclick="change_h1()">Change data source</button>
+      </div>
+    </div>
+
+    <div>
+
+      <h2><a name="features">Features</a></h2>
+
+      <p>
+        The concept for the code is dervied from the Raphaël
+        <a href="http://raphaeljs.com/analytics.html">Analytics example</a>.<br/>
+      </p>
+      <ul>
+        <li>Draws a line chart with custom design for a given set of data.</li>
+        <li>Framework agnostic (only requirement is Raphaël).</li>
+        <li>Semantic use of the document: data is loaded from a table element.</li>
+        <li>Ability to change data source (updating the chart).</li>
+        <li>Custom display of X &amp; Y axis labels.</li>
+      </ul>
+
+      <h2><a name="requirements">Requirements</a></h2>
+
+      <ul>
+        <li>Raphaël - <a href="http://raphaeljs.com">http://raphaeljs.com</a></li>
+      </ul>
+
+    </div>
+
+    <div class="box">
+      <div class="inner">
+        <div id="chart2"></div>
+      </div>
+    </div>
+
+    <div>
+
+      <h2><a name="usage">Usage</a></h2>
+
+      <h3><a name="usage_include">Include it.</a></h3>
+
+      <script src="https://gist.github.com/986722.js?file=linechart-include.html"></script>
+
+      <h3><a name="usage_data">Give it data.</a></h3>
+
+      <p>
+        Provide the plugin with either:
+      </p>
+
+      <ul>
+        <li>
+          <p>
+            A table element (the DOM element or just its id) using a specific structure:
+          </p>
+          <script src="https://gist.github.com/986722.js?file=linechart-data-table.html"></script>
+        </li>
+        <li>
+          <p>
+            A data object with four arrays: labels, values and info lines 1 &amp; 2:
+          </p>
+          <script src="https://gist.github.com/986722.js?file=linechart-data-object.js"></script>
+        </li>
+        <li>
+          <p>
+            A data object with the same structure, but with <b>array lists</b> for the
+            values and info lines.<br/>
+            The first list would be immediately used, and you can then switch
+            data object to display by passing the array index<br/>
+            (see <a href="#usage_dance"><i>Dance</i></a>).
+          </p>
+          <script src="https://gist.github.com/986722.js?file=linechart-data-array.js"></script>
+        </li>
+      </ul>
+
+      <h3><a name="usage_call">Call it.</a></h3>
+
+      <script src="https://gist.github.com/986722.js?file=linechart-call.html"></script>gist
+
+      <h3><a name="usage_dance">Dance.</a></h3>
+
+      <p>
+        If you'd like, you can tell the plugin to change the dataset it's displaying.<br/>
+        You can either pass a new table element, a new data object or an index (if you used
+        the objects array method).<br/>
+        The chart would magically move to the new spot, using a configurable Raphaël animation.
+      </p>
+      <script src="https://gist.github.com/986722.js?file=linechart-dance.js"></script>gist
+
+    </div>
+
+    <div class="box">
+      <div class="inner">
+        <div id="chart3"></div>
+      </div>
+    </div>
+
+    <div>
+
+      <h2><a name="documentations">Documentation</a></h2>
+
+      <p>The lineChart() plugin will accept a list of arguments in a json style format.</p>
+
+      <script src="https://gist.github.com/986722.js?file=linechart-opts.js"></script>
+    </div>
+
+
+    <div>
+
+      <h2><a name="download">Download</a></h2>
+
+      <p>
+        Check out <a href="https://github.com/n0nick/raphael-linechart">the project page on GitHub</a>
+        to download the source and example files.
+      </p>
+
+    </div>
+
+    <div class="box">
+      <div class="inner">
+        <div id="chart4"></div>
+      </div>
+    </div>
+
+    <div>
+
+      <h2><a name="license">License</a></h2>
+
+      <p>
+        The plugin is dual-licensed under the
+        <a href="http://www.opensource.org/licenses/gpl-3.0">GNU General Public License</a>
+        and the <a href="http://www.opensource.org/licenses/mit-license">MIT License</a>.
+      </p>
+
+    </div>
+
+    <div>
+
+      <h2><a name="thanks">Thanks!</a></h2>
+      <p>
+        This page is mostly a rip-off of the original
+        <a href="http://joedesigns.com/labs/Beautiful-Analytics-Chart/">Beautiful Analytics Chart</a>
+        code, which my plugin is a fork of.<br/>
+        So credit is due to <a href="http://joedesigns.com/">Joe Designs</a> for the initial work and <a href="http://raphaeljs.com/">Dmitry Baranovskiy</a> for Raphaël JS.
+      </p>
+
+    </div>
+
+  </div>
+
+  <table id="d1" style="display: none;">
+      <tfoot>
+          <tr>
+                  <th>3/02</th>
+                  <th>3/03</th>
+                  <th>3/09</th>
+                  <th>3/16</th>
+                  <th>3/18</th>
+                  <th>3/21</th>
+                  <th>3/22</th>
+                  <th>3/28</th>
+                  <th>3/29</th>
+                  <th>3/30</th>
+                  <th>3/31</th>
+                  <th>4/01</th>
+                  <th>4/02</th>
+                  <th>4/04</th>
+                  <th>4/05</th>
+                  <th>4/06</th>
+                  <th>4/07</th>
+                  <th>4/08</th>
+                  <th>4/09</th>
+                  <th>4/10</th>
+                  <th>4/12</th>
+                  <th>4/13</th>
+                  <th>4/14</th>
+                  <th>4/15</th>
+                  <th>4/16</th>
+                  <th>4/17</th>
+                  <th>4/18</th>
+                  <th>4/19</th>
+                  <th>4/20</th>
+                  <th>4/21</th>
+                  <th>4/22</th>
+              </tr>
+      </tfoot>
+      <tbody class="data">
+          <tr>
+                  <td>70</td>
+                  <td>70</td>
+                  <td>210</td>
+                  <td>490</td>
+                  <td>105</td>
+                  <td>70</td>
+                  <td>0</td>
+                  <td>105</td>
+                  <td>0</td>
+                  <td>210</td>
+                  <td>0</td>
+                  <td>70</td>
+                  <td>0</td>
+                  <td>70</td>
+                  <td>245</td>
+                  <td>350</td>
+                  <td>0</td>
+                  <td>280</td>
+                  <td>175</td>
+                  <td>210</td>
+                  <td>140</td>
+                  <td>210</td>
+                  <td>210</td>
+                  <td>420</td>
+                  <td>70</td>
+                  <td>140</td>
+                  <td>70</td>
+                  <td>1085</td>
+                  <td>875</td>
+                  <td>350</td>
+                  <td>175</td>
+            </tr>
+      </tbody>
+      <tbody class="line1">
+          <tr>
+                  <td>70 Views</td>
+                  <td>70 Views</td>
+                  <td>210 Views</td>
+                  <td>490 Views</td>
+                  <td>105 Views</td>
+                  <td>70 Views</td>
+                  <td>0 Views</td>
+                  <td>105 Views</td>
+                  <td>0 Views</td>
+                  <td>210 Views</td>
+                  <td>0 Views</td>
+                  <td>70 Views</td>
+                  <td>0 Views</td>
+                  <td>70 Views</td>
+                  <td>245 Views</td>
+                  <td>350 Views</td>
+                  <td>0 Views</td>
+                  <td>280 Views</td>
+                  <td>175 Views</td>
+                  <td>210 Views</td>
+                  <td>140 Views</td>
+                  <td>210 Views</td>
+                  <td>210 Views</td>
+                  <td>420 Views</td>
+                  <td>70 Views</td>
+                  <td>140 Views</td>
+                  <td>70 Views</td>
+                  <td>1,085 Views</td>
+                  <td>875 Views</td>
+                  <td>350 Views</td>
+                  <td>175 Views</td>
+            </tr>
+      </tbody>
+      <tbody class="line2">
+          <tr>
+                  <td>Mar 2nd 2011</td>
+                  <td>Mar 3rd 2011</td>
+                  <td>Mar 9th 2011</td>
+                  <td>Mar 16th 2011</td>
+                  <td>Mar 18th 2011</td>
+                  <td>Mar 21st 2011</td>
+                  <td>Mar 22nd 2011</td>
+                  <td>Mar 28th 2011</td>
+                  <td>Mar 29th 2011</td>
+                  <td>Mar 30th 2011</td>
+                  <td>Mar 31st 2011</td>
+                  <td>Apr 1st 2011</td>
+                  <td>Apr 2nd 2011</td>
+                  <td>Apr 4th 2011</td>
+                  <td>Apr 5th 2011</td>
+                  <td>Apr 6th 2011</td>
+                  <td>Apr 7th 2011</td>
+                  <td>Apr 8th 2011</td>
+                  <td>Apr 9th 2011</td>
+                  <td>Apr 10th 2011</td>
+                  <td>Apr 12th 2011</td>
+                  <td>Apr 13th 2011</td>
+                  <td>Apr 14th 2011</td>
+                  <td>Apr 15th 2011</td>
+                  <td>Apr 16th 2011</td>
+                  <td>Apr 17th 2011</td>
+                  <td>Apr 18th 2011</td>
+                  <td>Apr 19th 2011</td>
+                  <td>Apr 20th 2011</td>
+                  <td>Apr 21st 2011</td>
+                  <td>Apr 22nd 2011</td>
+            </tr>
+      </tbody>
+  </table>
+
+  <table id="d2" style="display: none;">
+      <tfoot>
+          <tr>
+                  <th>3/02</th>
+                  <th>3/03</th>
+                  <th>3/09</th>
+                  <th>3/16</th>
+                  <th>3/18</th>
+                  <th>3/21</th>
+                  <th>3/22</th>
+                  <th>3/28</th>
+                  <th>3/29</th>
+                  <th>3/30</th>
+                  <th>3/31</th>
+                  <th>4/01</th>
+                  <th>4/02</th>
+                  <th>4/04</th>
+                  <th>4/05</th>
+                  <th>4/06</th>
+                  <th>4/07</th>
+                  <th>4/08</th>
+                  <th>4/09</th>
+                  <th>4/10</th>
+                  <th>4/12</th>
+                  <th>4/13</th>
+                  <th>4/14</th>
+                  <th>4/15</th>
+                  <th>4/16</th>
+                  <th>4/17</th>
+                  <th>4/18</th>
+                  <th>4/19</th>
+                  <th>4/20</th>
+                  <th>4/21</th>
+                  <th>4/22</th>
+              </tr>
+      </tfoot>
+      <tbody class="data">
+          <tr>
+                  <td>70</td>
+                  <td>140</td>
+                  <td>350</td>
+                  <td>840</td>
+                  <td>945</td>
+                  <td>1015</td>
+                  <td>1015</td>
+                  <td>1120</td>
+                  <td>1120</td>
+                  <td>1330</td>
+                  <td>1330</td>
+                  <td>1400</td>
+                  <td>1400</td>
+                  <td>1470</td>
+                  <td>1715</td>
+                  <td>2065</td>
+                  <td>2065</td>
+                  <td>2345</td>
+                  <td>2520</td>
+                  <td>2730</td>
+                  <td>2870</td>
+                  <td>3080</td>
+                  <td>3290</td>
+                  <td>3710</td>
+                  <td>3780</td>
+                  <td>3920</td>
+                  <td>3990</td>
+                  <td>5075</td>
+                  <td>5950</td>
+                  <td>6300</td>
+                  <td>6475</td>
+            </tr>
+      </tbody>
+      <tbody class="line1">
+          <tr>
+                  <td>70 Users</td>
+                  <td>140 Users</td>
+                  <td>350 Users</td>
+                  <td>840 Users</td>
+                  <td>945 Users</td>
+                  <td>1,015 Users</td>
+                  <td>1,015 Users</td>
+                  <td>1,120 Users</td>
+                  <td>1,120 Users</td>
+                  <td>1,330 Users</td>
+                  <td>1,330 Users</td>
+                  <td>1,400 Users</td>
+                  <td>1,400 Users</td>
+                  <td>1,470 Users</td>
+                  <td>1,715 Users</td>
+                  <td>2,065 Users</td>
+                  <td>2,065 Users</td>
+                  <td>2,345 Users</td>
+                  <td>2,520 Users</td>
+                  <td>2,730 Users</td>
+                  <td>2,870 Users</td>
+                  <td>3,080 Users</td>
+                  <td>3,290 Users</td>
+                  <td>3,710 Users</td>
+                  <td>3,780 Users</td>
+                  <td>3,920 Users</td>
+                  <td>3,990 Users</td>
+                  <td>5,075 Users</td>
+                  <td>5,950 Users</td>
+                  <td>6,300 Users</td>
+                  <td>6,475 Users</td>
+            </tr>
+      </tbody>
+      <tbody class="line2">
+          <tr>
+                  <td>Mar 2nd 2011</td>
+                  <td>Mar 3rd 2011</td>
+                  <td>Mar 9th 2011</td>
+                  <td>Mar 16th 2011</td>
+                  <td>Mar 18th 2011</td>
+                  <td>Mar 21st 2011</td>
+                  <td>Mar 22nd 2011</td>
+                  <td>Mar 28th 2011</td>
+                  <td>Mar 29th 2011</td>
+                  <td>Mar 30th 2011</td>
+                  <td>Mar 31st 2011</td>
+                  <td>Apr 1st 2011</td>
+                  <td>Apr 2nd 2011</td>
+                  <td>Apr 4th 2011</td>
+                  <td>Apr 5th 2011</td>
+                  <td>Apr 6th 2011</td>
+                  <td>Apr 7th 2011</td>
+                  <td>Apr 8th 2011</td>
+                  <td>Apr 9th 2011</td>
+                  <td>Apr 10th 2011</td>
+                  <td>Apr 12th 2011</td>
+                  <td>Apr 13th 2011</td>
+                  <td>Apr 14th 2011</td>
+                  <td>Apr 15th 2011</td>
+                  <td>Apr 16th 2011</td>
+                  <td>Apr 17th 2011</td>
+                  <td>Apr 18th 2011</td>
+                  <td>Apr 19th 2011</td>
+                  <td>Apr 20th 2011</td>
+                  <td>Apr 21st 2011</td>
+                  <td>Apr 22nd 2011</td>
+            </tr>
+      </tbody>
+  </table>
+
+  <a href="https://github.com/vespa/raphael-multiple-linechart" id="fork_me"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+</body>
+</html>
